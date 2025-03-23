@@ -3,6 +3,7 @@
 - Register
 - Login
 - Database matching
+- save(), find({property: value}) property used here.And password human readable
 
 ### 1.1 user Schema create
 
@@ -73,16 +74,41 @@ app.listen(PORT, () => {
 
 ```javascript
 const User = require("./models/user.model");
-app.post("/register", (req, res) => {
+app.post("/register", async (req, res) => {
   const { email, password } = req.body;
   try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
     const newUser = new User({ email, password });
-    console.log(newUser);
+
     newUser.save();
     res.status(201).json(newUser);
   } catch (error) {
     console.error(error);
     res.status(500).json(error.message);
+  }
+});
+```
+
+#### 1.4 User login
+
+```javascript
+const User = require("./models/user.model");
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email });
+    console.log(user);
+    if (user && user.password === password) {
+      res.status(200).json({ status: "valid user" });
+    } else {
+      return res.status(401).json({ status: "Invalid email or password" });
+    }
+  } catch (error) {
+    console.error("Login Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 ```
