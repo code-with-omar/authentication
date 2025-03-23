@@ -112,3 +112,71 @@ app.post("/login", async (req, res) => {
   }
 });
 ```
+
+## Chapter 2 :Database Encryption
+
+- Here use mongoose-encryption
+- Go to the documentation of mongoose-encryption https://www.npmjs.com/package/mongoose-encryption
+- Install mongoose-encryption
+  ```cmd
+  npm i mongoose-encryption
+  ```
+
+### 2.1 create new mongoose Schema
+
+### 2.1.1 Require dependancy create Schema
+
+```javascript
+const mongoose = require("mongoose");
+const encrypt = require("mongoose-encryption");
+
+const userSchema = new mongoose.Schema({
+  name: String,
+  age: Number,
+  // whatever else
+});
+```
+
+### 2.1.2 create an encryption key inside .env file
+
+```javascript
+ENCRYPTION_KEY = thisismyencryptionkeyforregisterlogin;
+```
+
+### 2.1.2 Use plugin Schema with secret
+
+```javascript
+userSchema.plugin(encrypt, {
+  secret: encKey,
+  encryptedFields: ["password"],
+});
+```
+
+### 2.1.3 Full mongoose Schema
+
+```javascript
+const mongoose = require("mongoose");
+const encrypt = require("mongoose-encryption");
+
+const userSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  createdOn: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+const encKey = process.env.ENCRYPTION_KEY;
+userSchema.plugin(encrypt, {
+  secret: encKey,
+  encryptedFields: ["password"],
+});
+module.exports = mongoose.model("User", userSchema);
+```
