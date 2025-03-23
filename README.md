@@ -92,7 +92,7 @@ app.post("/register", async (req, res) => {
 });
 ```
 
-#### 1.4 User login
+### 1.4 User login
 
 ```javascript
 const User = require("./models/user.model");
