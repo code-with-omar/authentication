@@ -180,3 +180,57 @@ userSchema.plugin(encrypt, {
 });
 module.exports = mongoose.model("User", userSchema);
 ```
+
+### Chapter 3:Hashing password
+
+- No Nedd any cncryption key; we will use hashing algorithm
+
+- Hackers can not convert to plain text as no encryption key is available
+
+-md5 package: https://www.npmjs.com/package/md5
+
+```cmd
+install md5 npm package: npm install md5
+
+```
+
+### Register
+
+```javascript
+app.post("/register", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+    const newUser = new User({ email, password: md5(req.body.password) }); // Hashing function use
+
+    newUser.save();
+    res.status(201).json(newUser);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json(error.message);
+  }
+});
+```
+
+### Login
+
+```Javascript
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email });
+    // md5(password) make hashing
+    if (user && user.password === md5(password)) {
+      res.status(200).json({ status: "valid user" });
+    } else {
+      return res.status(401).json({ status: "Invalid email or password" });
+    }
+  } catch (error) {
+    console.error("Login Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+```

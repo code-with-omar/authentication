@@ -1,9 +1,9 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const md5 = require("md5");
 const mongoose = require("mongoose");
 const User = require("./models/user.model");
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 const dbURL = process.env.MONGO_URL;
@@ -22,8 +22,6 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bo
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
 });
-console.log(md5("hello"));
-
 app.post("/register", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -31,7 +29,7 @@ app.post("/register", async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
-    const newUser = new User({ email, password: md5(req.body.password) });
+    const newUser = new User({ email, password });
 
     newUser.save();
     res.status(201).json(newUser);
@@ -44,7 +42,8 @@ app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email });
-    if (user && user.password === md5(password)) {
+    console.log(user);
+    if (user && user.password === password) {
       res.status(200).json({ status: "valid user" });
     } else {
       return res.status(401).json({ status: "Invalid email or password" });

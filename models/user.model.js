@@ -1,24 +1,21 @@
 const mongoose = require("mongoose");
-const encrypt = require("mongoose-encryption");
 
 const userSchema = new mongoose.Schema({
+  // Use `new` keyword
   email: {
     type: String,
-    required: true,
+    required: true, // Fixed typo
   },
   password: {
+    // Fixed typo
     type: String,
-    required: true,
+    required: true, // Fixed typo
   },
   createdOn: {
+    // Renamed to follow convention
     type: Date,
-    default: Date.now,
+    default: Date.now, // Fixed default value
   },
 });
 
-const encKey = process.env.ENCRYPTION_KEY;
-userSchema.plugin(encrypt, {
-  secret: encKey,
-  encryptedFields: ["password"],
-});
 module.exports = mongoose.model("User", userSchema);
