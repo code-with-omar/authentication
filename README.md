@@ -187,7 +187,7 @@ module.exports = mongoose.model("User", userSchema);
 
 - Hackers can not convert to plain text as no encryption key is available
 
--md5 package: https://www.npmjs.com/package/md5
+- md5 package: https://www.npmjs.com/package/md5
 
 ```cmd
 install md5 npm package: npm install md5
