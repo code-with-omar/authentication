@@ -27,19 +27,25 @@ console.log(md5("hello"));
 app.post("/register", async (req, res) => {
   const { email, password } = req.body;
   try {
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
+    }
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
-    const newUser = new User({ email, password: md5(req.body.password) });
+    const newUser = new User({ email, password: md5(password) });
 
-    newUser.save();
+    await newUser.save();
     res.status(201).json(newUser);
   } catch (error) {
     console.error(error);
-    res.status(500).json(error.message);
+    res.status(500).json({ message: error.message });
   }
 });
+
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
