@@ -1,8 +1,11 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const md5 = require("md5");
+
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+
 const User = require("./models/user.model");
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,7 +25,6 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bo
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
 });
-console.log(md5("hello"));
 
 app.post("/register", async (req, res) => {
   const { email, password } = req.body;
@@ -36,10 +38,14 @@ app.post("/register", async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
-    const newUser = new User({ email, password: md5(password) });
-
-    await newUser.save();
-    res.status(201).json(newUser);
+    bcrypt.hash(password, saltRounds, async (err, hash) => {
+      const newUser = new User({
+        email: email,
+        password: hash,
+      });
+      await newUser.save();
+      res.status(201).json(newUser);
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
@@ -50,8 +56,12 @@ app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email });
-    if (user && user.password === md5(password)) {
-      res.status(200).json({ status: "valid user" });
+    if (user) {
+      bcrypt.compare(password, user.password, function (err, result) {
+        if (result === true) {
+          res.status(200).json({ status: "valid user" });
+        }
+      });
     } else {
       return res.status(401).json({ status: "Invalid email or password" });
     }
