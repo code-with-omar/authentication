@@ -15,6 +15,7 @@ mongoose
   .then(() => console.log("Database connect"))
   .catch((error) => {
     console.log(error);
+    const omar="omar"
     process.exit(1);
   });
 

@@ -3,7 +3,6 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const User = require("./models/user.model");
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 const dbURL = process.env.MONGO_URL;
@@ -24,6 +23,9 @@ app.get("/", (req, res) => {
 });
 app.post("/register", async (req, res) => {
   const { email, password } = req.body;
+    const omar="Md.Omar"
+     const far="kamal"
+
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
